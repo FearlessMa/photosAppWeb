@@ -13,8 +13,10 @@ a.interceptors.response.use(function (response: any) {
   return Promise.reject(error);
 });
 
-const fetchData = (url: string, params: {}, method = 'post') => {
-  return a[method](api[url], params)
+
+const fetchData: MyApp.IFetchData = {
+  get: (url: string, params: {}, method = 'get') => a[method](api[url], params),
+  post: (url: string, params: {}, method = 'post') => a[method](api[url], params)
 }
 
 export default fetchData;

@@ -1,24 +1,41 @@
-import { createStore, Store } from 'redux';
+import { createStore, Store, applyMiddleware, compose } from 'redux';
 import { reducer } from './reducer';
+import { rootSagas } from './sagas';
+import createSagaMiddleware from 'redux-saga'
+import { register } from './sagas';
+export { register }
+// process.env
+console.log('process.env: ', process.env.NODE_ENV);
+
+const sagaMiddleWare = createSagaMiddleware();
 
 const w: any = window as any;
 let devtools: any = w.__REDUX_DEVTOOLS_EXTENSION__ ? w.__REDUX_DEVTOOLS_EXTENSION__() : (f: any) => f;
 const store: Store = createStore(
   reducer,
-  devtools
+  compose(
+    applyMiddleware(sagaMiddleWare),
+    devtools
+  )
 )
+
+sagaMiddleWare.run(rootSagas);
+
+// const middleware = [];
+// let storeEnhancer = [];
+// if (process.env.NODE_ENV === 'production') {
+//   middleware.push(sagas);
+//   storeEnhancer = applyMiddleware(...middleware);
+// }
+// if (process.env.NODE_ENV === 'development') {
+//   middleware.push(sagas, logger);
+//   storeEnhancer = compose(
+//     applyMiddleware(...middleware),
+//     devtools
+//   );
+// }
+// const store = createStore(reducer, storeEnhancer);
+
 
 export default store
 
-// import { applyMiddleware, createStore } from 'redux';
-
-// import rootReducer from './reducers/root';
-
-// import thunk from 'redux-thunk';
-
-// const w : any = window as any;
-// const devtools: any = w.devToolsExtension ? w.devToolsExtension() : (f:any)=>f;
-// const middleware = applyMiddleware(thunk);
-// const store: any = middleware(devtools(createStore))(rootReducer);
-
-// export default store;

@@ -1,6 +1,10 @@
 import * as React from "react";
 import LoginUI from "./loginUI";
 import "./loginUI.less";
+import { register } from "src/store/sagas";
+import  loginSagas from "./model";
+register(loginSagas);
+
 export interface LoginProps {
   [name: string]: any;
 }

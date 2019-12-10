@@ -12,12 +12,20 @@
     "allowJs": true,
     "jsx": "react",
     "moduleResolution": "node",
-    "rootDir": "src",
+    "rootDir": ".",
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": false,
     "strictNullChecks": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "paths": {
+      "utils": [
+        "./src/utils/index"
+      ],
+      "store/*": [
+        "./src/store/*"
+      ]
+    },
   },
   "exclude": [
     "node_modules",

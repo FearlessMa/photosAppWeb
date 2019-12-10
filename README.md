@@ -77,3 +77,38 @@
  git push                    #远程仓库的提交（第二次及之后）
 
 ```
+
+## 知识点记录
+
+* export 导出的类型是Module
+
+```js
+/* 
+  params:  
+  Module {default: {…}, __esModule: true, Symbol(Symbol.toStringTag): "Module"}
+  default: {fetchLogin: ƒ}
+  loginSagas: Object
+  fetchLogin: ƒ (_a, action)
+  __proto__: Object
+  Symbol(Symbol.toStringTag): "Module"
+  __esModule: true
+  get loginSagas: ƒ ()
+  __proto__: Object 
+*/
+
+// Object.prototype.toString.call(params):  [object Module]
+
+```
+
+* export default 导出的是 Object
+
+```js
+/*
+  params:  
+  {fetchLogin: ƒ}
+  fetchLogin: ƒ (_a, action)
+  __proto__: Object
+*/
+//  Object.prototype.toString.call(params):  [object Object]
+
+```

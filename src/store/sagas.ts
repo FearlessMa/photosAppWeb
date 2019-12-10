@@ -1,9 +1,8 @@
-import { put, call, takeEvery, take, takeLatest, all, PutEffect, CallEffect, ForkEffect, TakeEffect, AllEffect } from 'redux-saga/effects';
+import { put, call, takeEvery, take, takeLatest, all, PutEffect, CallEffect, TakeEffect, AllEffect } from 'redux-saga/effects';
 import { Action } from "redux";
-
 import { fetchData } from "src/server";
-
-
+import { camelToUnderline } from 'utils';
+import * as actionTypes from './actionTypes'
 interface IData {
   [name: string]: any
 }
@@ -13,7 +12,7 @@ interface TranSagas {
 }
 
 interface myEffect {
-  fetchData: MyApp.IFetchData,
+  fetchData: MYAPP.IFetchData,
   put<A extends Action>(action: A): PutEffect<A>,
   call<A extends Action>(action: A): CallEffect<A>,
   take<A extends Action>(action: A): TakeEffect,
@@ -60,7 +59,6 @@ class MapGeneratorToSagas implements TranSagas {
         }
       })
     }
-    console.log('this[dataKey]: ', this[dataKey]);
   }
   /**
    *
@@ -86,24 +84,18 @@ class MapGeneratorToSagas implements TranSagas {
     console.log('dataList: ', dataList);
     const list: Array<any> = [];
     dataList.forEach(item => {
-      console.log('item: ', item);
       const [k, v] = item;
-      console.log('typeof v: ', typeof v);
       if (typeof v === 'function') {
-
-        list.push(takeEvery(k as any, this.insertEffect(v) as any));
+        // 驼峰转下划线
+        const key = camelToUnderline(k);
+        list.push(takeEvery(actionTypes[key], this.insertEffect(v)));
       }
     })
-    console.log('list: ', list);
     return list;
   }
 }
 
 const toSagas = new MapGeneratorToSagas();
-// toSagas.register({ FETCH_LOGIN: fetchLogin });
-console.log('toSagas: ', toSagas);
-
-
 
 
 // 导出注入函数

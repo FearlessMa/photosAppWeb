@@ -1,0 +1,26 @@
+@background: rgb(241, 242, 245);
+@white: #ffffff;
+@p10: 10px;
+
+.photos-box {
+  background-color: @background;
+}
+.photos-header {
+  margin: 0 @p10;
+  background-color: @white;
+  min-height: @p10 * 10;
+}
+.photos-container {
+  display: flex;
+  flex-wrap: wrap;
+  &.hidden {
+    overflow: hidden;
+  }
+  .photos-card {
+    flex: 1;
+    margin: @p10;
+    &:hover {
+      width: 110%;
+    }
+  }
+}

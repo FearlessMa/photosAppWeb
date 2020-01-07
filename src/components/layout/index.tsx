@@ -1,8 +1,13 @@
 import * as React from 'react';
-import { Layout, Row, Button, Icon } from 'antd';
+import { Layout, Row, Button, Icon, Skeleton } from 'antd';
 import AppMenus from '../menu';
 import Logo from './logo';
 import './index.less';
+import LogOut from 'src/pages/logout'
+import { Switch, Route, Redirect } from 'react-router-dom';
+import Dashboard from 'src/pages/dashboard';
+import Photos from 'src/pages/photos'
+
 const { Header, Footer, Sider, Content } = Layout;
 
 interface IProps {
@@ -30,6 +35,19 @@ export default class AppLayout extends React.Component<IProps, IState> {
   toggle = (): void => {
     this.setState({ collapsed: !this.state.collapsed })
   }
+  componentDidMount() {
+    
+    if (!this.props.auth) {
+      
+      this.props.history.push('/login');
+    }
+    // window.addEventListener('resize', () => {
+    //   const screenWidth = document.body.clientWidth;
+    //   this.setState({
+    //     collapsed: screenWidth < 800 ? true : false
+    //   })
+    // })
+  }
   render() {
 
     return (
@@ -37,19 +55,38 @@ export default class AppLayout extends React.Component<IProps, IState> {
         <Layout className="layout-box">
           <Sider
             collapsed={this.state.collapsed}
+            className="layout-sider"
           >
             <Logo />
             <AppMenus />
           </Sider>
-          <Layout>
-            <Header>
+          <Layout className={`layout-right ${this.state.collapsed ? 'padding' : ''}`}>
+            <Header className="layout-header" style={{ zIndex: 0 }} />
+            <Header className={`layout-header header-fixed ${this.state.collapsed ? 'collapsed' : ''}`}>
               <Icon type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'} onClick={this.toggle} />
+              <LogOut />
             </Header>
-            <Content>content</Content>
+            <Content>
+              <Container {...this.props} />
+            </Content>
             <Footer>footer</Footer>
           </Layout>
         </Layout>
       </React.Fragment >
     )
   }
+}
+
+const Container = (props) => {
+  
+  return (
+    <div className={'container'}>
+      <Switch>
+        <Redirect exact from='/' to="/dashboard" />
+        <Route path="/dashboard" component={Dashboard} />
+        <Route path="/photos" component={Photos} />
+        <Route path="*" component={() => <div>404</div>} />
+      </Switch>
+    </div>
+  )
 }

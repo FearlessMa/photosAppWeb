@@ -1,13 +1,7 @@
 import * as React from "react";
-import { Component } from "react";
 import { Row, Col, Form, Button, Input, Icon } from "antd";
-import { FormProps } from "antd/lib/form";
-import { api, fetchData } from "src/server";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
-import { FETCH_LOGIN } from "store/actionTypes";
-
 const FormItem = Form.Item;
+
 export interface LoginUIProps {
   [name: string]: any;
 }
@@ -33,25 +27,10 @@ const loginConfig = [
   }
 ];
 
-const mapStateToProps = (state: any) => {
-  console.log("state: ", state);
-  return {};
-};
-const mapDispatchToProps = (dispatch: Dispatch) => {
-  return {
-    promiseLogin: data => {
-      dispatch({ type: FETCH_LOGIN, data });
-      console.log("FETCH_LOGIN: ", FETCH_LOGIN);
-      // console.log('FETCH_LOGIN: ', FETCH_LOGIN);
-    }
-  };
-};
-@(connect(mapStateToProps, mapDispatchToProps) as any)
-@(Form.create() as any)
 export default class LoginUI extends React.Component<
   LoginUIProps,
   LoginUIState
-> {
+  > {
   constructor(props: LoginUIProps) {
     super(props);
     this.state = {};
@@ -60,13 +39,7 @@ export default class LoginUI extends React.Component<
   submit = () => {
     this.props.form.validateFields((err: string, values: object) => {
       if (!err) {
-        console.log("props", this.props);
-        console.log("values: ", values);
         this.props.promiseLogin(values);
-        // this.props.toLogin(values);
-        // fetchData("login", values, "post").then((res: any) => {
-        //   console.log("res: ", res);
-        // });
       }
     });
   };
@@ -114,4 +87,3 @@ export default class LoginUI extends React.Component<
   }
 }
 
-// export default Form.create()(LoginUI);

@@ -1,7 +1,13 @@
 import * as React from "react";
-import { Menu, Icon, Divider } from "antd";
+import { Menu, Icon, Divider, Skeleton } from "antd";
 import { ClickParam, MenuProps } from "antd/lib/menu";
+import { menuModel } from './model';
+import { registerSaga } from 'src/store';
+import { connect } from 'react-redux';
+import { withRouter, Link } from 'react-router-dom';
+import { ACTIVE_MENU } from 'store/actionTypes';
 
+registerSaga(menuModel)
 const MenuItem = Menu.Item;
 const { SubMenu } = Menu;
 
@@ -12,23 +18,51 @@ interface Istate {
   [name: string]: any;
 }
 
+const mapStateToProps = state => {
+  const { menuState } = state;
+  return ({ menuList: menuState.menuList, activeMenu: menuState.activeMenu });
+}
+const mapDispatchToProps = dispatch => ({
+  fetchMenu() { dispatch({ type: 'fetchMenu' }) },
+  setActiveMenu(activeMenu) { dispatch({ type: ACTIVE_MENU, payload: { activeMenu } }) }
+});
+
+@(withRouter as any)
+@(connect(mapStateToProps, mapDispatchToProps) as any)
 export default class AppMenus extends React.Component<Iprops, Istate> {
   constructor(readonly props: Iprops) {
     super(props);
+    this.props.fetchMenu();
+    this.state = { selectKeys: this.props.activeMenu || [] }
   }
 
   menuOnClick = (params: ClickParam) => {
     const { item, key, keyPath, domEvent } = params;
+    const { history } = this.props;
     console.log("domEvent: ", domEvent);
     console.log("keyPath: ", keyPath);
     console.log("key: ", key);
     console.log("item: ", item);
+    this.setSelectMenuKeys([key]);
+    const path = key.split('-')[0];
+    if (history.location.pathname !== path) {
+      this.props.history.push(path);
+    }
   };
-
+  setSelectMenuKeys = (keysList: string[]) => {
+    this.setState({ selectKeys: keysList });
+    this.props.setActiveMenu(keysList);
+  }
   render() {
     return (
       <React.Fragment>
-        <MenuIFC onClick={this.menuOnClick} inlineCollapsed={true} />
+        <MenuIFC
+          onClick={this.menuOnClick}
+          inlineCollapsed={true}
+          menuList={this.props.menuList}
+          selectKeys={this.state.selectKeys}
+          defaultKeys={[this.props.menuList[0] ? this.props.menuList[0].path + '-0' : '']}
+        />
       </React.Fragment>
     );
   }
@@ -36,37 +70,46 @@ export default class AppMenus extends React.Component<Iprops, Istate> {
 
 // 继承antd MenuProps属性
 interface IMenuProps extends MenuProps {
-  // [name: string]: any,
+  [name: string]: any,
   menuOnClick?: (data: ClickParam) => void;
+  menuList: any[]
 }
 
 const MenuIFC: IFCspace.IFC = (props: IMenuProps): React.ReactElement => {
-  const { onClick } = props;
+  const { onClick, menuList, selectKeys, defaultKeys } = props;
+  const createMenu = (list) => {
+    return list.map((item, index) => {
+      if (Array.isArray(item.children)) {
+        return (
+          <SubMenu
+            key={item.path + '-' + index}
+            title={
+              <span>
+                {item.icon && <Icon type={item.icon} />}
+                <span>{item.name}</span>
+              </span>
+            }
+          >
+            {createMenu(item.children)}
+          </SubMenu>
+        )
+      } else {
+        return (<MenuItem key={item.path + '-' + index}>
+          <Icon type={item.icon} />
+          <span>{item.name}</span>
+        </MenuItem>)
+      }
+    })
+  }
   return (
     <React.Fragment>
       <Menu
         mode="inline"
         theme="dark"
         onClick={onClick}
-        defaultSelectedKeys={["1"]}
+        selectedKeys={selectKeys.length ? selectKeys : defaultKeys}
       >
-        <MenuItem key={"1"}>
-          <Icon type="user" />
-          <span>1</span>
-        </MenuItem>
-        <SubMenu
-          key={"SubMenu"}
-          title={
-            <span>
-              <Icon type="github" />
-              <span>SubMenu</span>
-            </span>
-          }
-        >
-          <MenuItem>2</MenuItem>
-          <MenuItem>3</MenuItem>
-          <MenuItem>4</MenuItem>
-        </SubMenu>
+        {createMenu(menuList)}
       </Menu>
     </React.Fragment>
   );

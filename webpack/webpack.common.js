@@ -50,6 +50,15 @@ module.exports = {
             }
           }
         ]
+      },
+      {
+        test: /\.png|jpg|gif$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {}
+          }
+        ]
       }
     ]
   },
@@ -59,6 +68,7 @@ module.exports = {
       src: path.resolve(__dirname, '../src'),
       components: path.resolve(__dirname, '../src/components'),
       store: path.resolve(__dirname, '../src/store'),
+      public: path.resolve(__dirname, '../public'),
     },
     extensions: ['*', '.js', '.jsx', '.ts', '.tsx', '.css', '.less', '.scss']
   },

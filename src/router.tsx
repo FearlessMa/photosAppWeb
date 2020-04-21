@@ -3,25 +3,13 @@ import {
   HashRouter as Router,
   Route,
   Redirect,
-  Switch,
-  Link
-} from "react-router-dom";
+  Switch} from "react-router-dom";
 import AppLayout from "./components/layout";
 import Login from "./pages/login";
 import { connect } from 'react-redux';
-import { cookiesUtils } from 'utils';
-const Home = (): React.ReactElement => (
-  <React.Fragment>
-    <AppLayout />
-  </React.Fragment>
-);
-const LoginApp = (): React.ReactElement => (
-  <React.Fragment>
-    <Login />
-  </React.Fragment>
-);
+import { fetchData } from 'src/server';
+import { USER_INFO } from "store/actionTypes";
 
-const Page = () => <div>page</div>;
 const Page404 = () => <div>404</div>;
 
 interface IRouter {
@@ -60,7 +48,7 @@ interface IRenderRouters {
   extraProps?: any;
   switchProps?: any;
 }
-const renderRouters = ({ routerMap, auth, authPath = '/login', extraProps = {}, switchProps = {} }: IRenderRouters) => {
+const renderRouters = ({ routerMap, auth, authPath = '/login', extraProps = {}, switchProps = {}, ...otherProps }: IRenderRouters) => {
   return (
     <React.Fragment>
       {routerMap ? (
@@ -72,16 +60,7 @@ const renderRouters = ({ routerMap, auth, authPath = '/login', extraProps = {}, 
                 path={route.path}
                 exact={route.exact}
                 render={(props: any = {}) => {
-                  const sessionId = cookiesUtils.getCookie('sid');
-                  if (!route.requiresAuth || sessionId || auth || authPath == route.path) {
-                    return <route.component
-                      {...props}
-                      {...extraProps}
-                      auth={auth}
-                      route={route}
-                    />
-                  }
-                  return <Redirect to={{ pathname: authPath, state: { form: props.location } }} />
+                  return renderRoute(({ route, auth, authPath, props, extraProps, otherProps }));
                 }}
               />
             );
@@ -97,29 +76,54 @@ const mapStateToProps = (state) => {
     auth: state.loginReducer ? state.loginReducer.isLogin : false
   }
 };
+const mapDispatchToProps = dispatch => {
+  return { getUserInfo: () => dispatch({ type: 'getUserInfo' }), setUserInfo: (data) => dispatch({ type: USER_INFO, payload: data }) }
+}
 
 
 const RouteComponent = props => {
-
-  const { auth } = props;
-  console.log('auth: ', auth);
-  const authPath = '/login';
+  console.log('props: ', props);
   return (
     <Router>
-      <Switch>
-        {renderRouters({ routerMap, auth: props.auth })}
-        {/* <Route exact path="/login" component={Login} />
-        <Route path="/" render={(props: any) => {
-
-          return auth ? <AppLayout {...props} auth={auth} /> : <Login />
-        }}
-        /> */}
-        {/* <Redirect from={'*'} to={{ pathname: authPath, state: { form: props.location } }} /> */}
-        {/* <Route  path="/" component={AppLayout} /> */}
-      </Switch>
+      {renderRouters({ routerMap, ...props })}
     </Router>
   );
 };
 
-export default connect(mapStateToProps, null)(RouteComponent)
+export default connect(mapStateToProps, mapDispatchToProps)(RouteComponent)
 
+const renderRoute = ({ route, auth, authPath, props, extraProps, otherProps }) => {
+
+  // 登录状态下去login 重定向
+  if (authPath == route.path) {
+    if (auth) {
+      return <Redirect to={{ pathname: '/', state: { form: props.location } }} />
+    }
+    return <route.component
+      {...props}
+      {...extraProps}
+      auth={auth}
+      route={route}
+    />
+  }
+  if (auth) {
+    return <route.component
+      {...props}
+      {...extraProps}
+      auth={auth}
+      route={route}
+    />
+  } else {
+    fetchData.get('getUserInfo').then(res => {
+      if (res.code === 200) {
+        otherProps.setUserInfo({
+          userInfo: res.userInfo,
+          isLogin: true
+        })
+      } else {
+        location.hash = "#" + authPath;
+      }
+    })
+  }
+  return null;
+}

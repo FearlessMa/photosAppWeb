@@ -5,7 +5,7 @@ import { menuModel } from './model';
 import { registerSaga } from 'src/store';
 import { connect } from 'react-redux';
 import { withRouter, Link } from 'react-router-dom';
-import { ACTIVE_MENU } from 'store/actionTypes';
+import { ACTIVE_MENU, OPEN_KEYS } from 'store/actionTypes';
 
 registerSaga(menuModel)
 const MenuItem = Menu.Item;
@@ -20,11 +20,12 @@ interface Istate {
 
 const mapStateToProps = state => {
   const { menuState } = state;
-  return ({ menuList: menuState.menuList, activeMenu: menuState.activeMenu });
+  return ({ menuList: menuState.menuList, activeMenu: menuState.activeMenu, openKeys: menuState.openKeys });
 }
 const mapDispatchToProps = dispatch => ({
   fetchMenu() { dispatch({ type: 'fetchMenu' }) },
-  setActiveMenu(activeMenu) { dispatch({ type: ACTIVE_MENU, payload: { activeMenu } }) }
+  setActiveMenu(activeMenu) { dispatch({ type: ACTIVE_MENU, payload: { activeMenu } }) },
+  setOpenKeys(openKeys) { dispatch({ type: OPEN_KEYS, payload: { openKeys } }) }
 });
 
 @(withRouter as any)
@@ -33,7 +34,7 @@ export default class AppMenus extends React.Component<Iprops, Istate> {
   constructor(readonly props: Iprops) {
     super(props);
     this.props.fetchMenu();
-    this.state = { selectKeys: this.props.activeMenu || [] }
+    this.state = { selectKeys: this.props.activeMenu || [], openKeys: this.props.openKeys || [] }
   }
 
   menuOnClick = (params: ClickParam) => {
@@ -53,7 +54,13 @@ export default class AppMenus extends React.Component<Iprops, Istate> {
     this.setState({ selectKeys: keysList });
     this.props.setActiveMenu(keysList);
   }
+  openChange = (openKeys: string[]) => {
+    console.log('openKeys: ', openKeys);
+    this.setState({ openKeys });
+    this.props.setOpenKeys(openKeys);
+  }
   render() {
+    const { openKeys } = this.state;
     return (
       <React.Fragment>
         <MenuIFC
@@ -62,6 +69,8 @@ export default class AppMenus extends React.Component<Iprops, Istate> {
           menuList={this.props.menuList}
           selectKeys={this.state.selectKeys}
           defaultKeys={[this.props.menuList[0] ? this.props.menuList[0].path + '-0' : '']}
+          openChange={this.openChange}
+          openKeys={openKeys}
         />
       </React.Fragment>
     );
@@ -76,7 +85,7 @@ interface IMenuProps extends MenuProps {
 }
 
 const MenuIFC: IFCspace.IFC = (props: IMenuProps): React.ReactElement => {
-  const { onClick, menuList, selectKeys, defaultKeys } = props;
+  const { onClick, menuList, selectKeys, defaultKeys, openChange, openKeys } = props;
   const createMenu = (list) => {
     return list.map((item, index) => {
       if (Array.isArray(item.children)) {
@@ -108,6 +117,8 @@ const MenuIFC: IFCspace.IFC = (props: IMenuProps): React.ReactElement => {
         theme="dark"
         onClick={onClick}
         selectedKeys={selectKeys.length ? selectKeys : defaultKeys}
+        onOpenChange={openChange}
+        openKeys={openKeys}
       >
         {createMenu(menuList)}
       </Menu>

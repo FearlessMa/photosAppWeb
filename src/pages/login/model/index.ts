@@ -1,23 +1,26 @@
-import { LOGIN } from "store/actionTypes";
+import { LOGIN, USER_INFO } from "store/actionTypes";
 import { Action } from "redux";
-// import { registerSaga, registerReducer } from "store/index";
 
 interface DataAction extends Action {
   data: any;
 }
 
 export const loginSagas = {
-  *fetchLogin({ call, put, fetchData, notice}, action: DataAction) {
-    console.log("action: loginSagas", action);
+  *fetchLogin({ call, put, fetchData, notice }, action: DataAction) {
     const res = yield call(fetchData.post, "login", { ...action.data });
-    console.log('res:loginSagas ', res);
+    yield put({ type: 'getUserInfo' });
     if (res.code === 200) {
-      yield put({ type: LOGIN, payload: { data: res.data, isLogin: true } });
+      yield put({ type: LOGIN });
     } else {
-      notice('error','登录失败',res.message);
+      notice('error', '登录失败', res.message);
     }
+  },
+  *getUserInfo({ call, put, fetchData }) {
+    const res = yield call(fetchData.get, "getUserInfo");
+    if (res.code === 200) {
+      yield put({ type: USER_INFO, payload: { userInfo: res.userInfo, isLogin: true } });
+    }
+    return res;
   }
 };
 
-// export default loginSagas;
-// registerSaga(loginSagas);

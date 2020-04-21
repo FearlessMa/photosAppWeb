@@ -39,17 +39,26 @@ class Login extends React.Component<LoginProps, LoginState> {
     super(props);
     this.state = {};
   }
-  shouldComponentUpdate(nextProps) {
-    if (nextProps.loginData.isLogin) {
-      this.props.history.push("/");
+  // shouldComponentUpdate(nextProps) {
+  //   if (nextProps.loginData.isLogin) {
+  //     console.log('nextProps: ', nextProps);
+  //     this.props.history.push("/dashboard");
+  //   }
+  //   return true
+  // }
+  componentDidMount() {
+    // const referenceData = sessionStorageUtils.getItem('state');
+    // console.log('referenceData: ', referenceData);
+    // if (referenceData) {
+    //   this.props.referenceData(referenceData)
+    // }
+    if (this.props.loginData.isLogin) {
+      this.props.history.push("/dashboard");
     }
-    return true
   }
-  // componentDidMount() {
-  //   const referenceData = sessionStorageUtils.getItem('state');
-  //   console.log('referenceData: ', referenceData);
-  //   if (referenceData) {
-  //     this.props.referenceData(referenceData)
+  // componentDidUpdate(prevProps){
+  //   if (this.props.loginData.isLogin && !prevProps.loginData.isLogin) {
+  //     this.props.history.push("/dashboard");
   //   }
   // }
   render() {

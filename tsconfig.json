@@ -24,7 +24,8 @@
       ],
       "store/*": [
         "./src/store/*"
-      ]
+      ],
+      "public/*":["./public/*"]
     },
   },
   "exclude": [

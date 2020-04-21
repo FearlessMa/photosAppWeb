@@ -1,8 +1,8 @@
 
-import { MENU_LIST, ACTIVE_MENU, RESET, REFERENCE } from 'store/actionTypes';
+import { MENU_LIST, ACTIVE_MENU, RESET, REFERENCE, OPEN_KEYS } from 'store/actionTypes';
 import { sessionStorageUtils } from 'utils'
 
-const initState = { menuList: [], activeMenu: [] };
+const initState = { menuList: [], activeMenu: [], openKeys: [] };
 const defaultState = (sessionStorageUtils.getItem('state') as any).menuState || initState;
 
 export const menuState = (state = defaultState, action: MYAPP.DataAction) => {
@@ -11,11 +11,13 @@ export const menuState = (state = defaultState, action: MYAPP.DataAction) => {
       return Object.assign({}, state, { ...action.payload });
     case ACTIVE_MENU:
       return Object.assign({}, state, { ...action.payload })
+    case OPEN_KEYS:
+      return Object.assign({}, state, { ...action.payload })
     case RESET:
       return Object.assign({}, initState);
     case REFERENCE:
       console.log('REFERENCE: ', REFERENCE);
-      return Object.assign({}, { ...action.payload.menuState});
+      return Object.assign({}, { ...action.payload.menuState });
     default:
       return state;
   }

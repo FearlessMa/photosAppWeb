@@ -28,7 +28,10 @@ const menu = (props) => {
     </Menu>)
 }
 
-const mapStateToProps = (state) => ({ loginData: state.loginReducer, userName: state.loginReducer.data ? state.loginReducer.data.userName : 'user' });
+const mapStateToProps = (state) => ({
+    loginData: state.loginReducer,
+    userName: state.loginReducer.userInfo ? state.loginReducer.userInfo.userName : ""
+});
 const mapDispatchToProps = (dispatch) => ({
     promiseLogout: () => dispatch({ type: 'fetchLogout' }),
     resetState: () => dispatch({ type: RESET })
@@ -49,19 +52,10 @@ class LogOut extends React.Component<LogOutProps, LogOutState> {
         this.clearSessionItem('state');
         this.props.promiseLogout();
         this.props.resetState();
-    }
-    gotoLoginPage = (isLogin) => {
-        console.log('isLogin: gotoLoginPage', isLogin);
-        if (!isLogin) {
-            this.push('/login');
-        }
+        this.push('/login');
     }
     push = (path) => { this.props.history.push(path); }
     clearSessionItem = (key: string) => { sessionStorageUtils.clearItem(key); }
-    shouldComponentUpdate(nextProps) {
-        this.gotoLoginPage(nextProps.loginData && nextProps.loginData.isLogin);
-        return true;
-    }
     render() {
         const menuProps = { menuClick: this.menuClick }
         return (<>

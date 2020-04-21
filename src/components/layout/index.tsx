@@ -36,17 +36,11 @@ export default class AppLayout extends React.Component<IProps, IState> {
     this.setState({ collapsed: !this.state.collapsed })
   }
   componentDidMount() {
-    
+
     if (!this.props.auth) {
-      
+
       this.props.history.push('/login');
     }
-    // window.addEventListener('resize', () => {
-    //   const screenWidth = document.body.clientWidth;
-    //   this.setState({
-    //     collapsed: screenWidth < 800 ? true : false
-    //   })
-    // })
   }
   render() {
 
@@ -78,7 +72,7 @@ export default class AppLayout extends React.Component<IProps, IState> {
 }
 
 const Container = (props) => {
-  
+
   return (
     <div className={'container'}>
       <Switch>

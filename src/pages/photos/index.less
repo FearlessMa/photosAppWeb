@@ -4,23 +4,38 @@
 
 .photos-box {
   background-color: @background;
+  .photos-btn {
+    margin: @p10;
+    background-color: @background;
+  }
 }
 .photos-header {
   margin: 0 @p10;
   background-color: @white;
   min-height: @p10 * 10;
+  .search {
+    width: 50%;
+    margin: auto;
+  }
 }
 .photos-container {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-around;
   &.hidden {
     overflow: hidden;
   }
   .photos-card {
+    display: flex;
     flex: 1;
-    margin: @p10;
-    &:hover {
-      width: 110%;
+    margin: @p10 5px;
+    max-width: 300px;
+    min-width: 300px;
+    img {
+      flex: 1;
+      min-width: 300px;
+      max-width: 300px;
+      height: 200px;
     }
   }
 }

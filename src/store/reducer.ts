@@ -1,6 +1,7 @@
 import { Action, Reducer, combineReducers } from "redux";
-import { loginReducer } from 'src/pages/login/store'
-import { menuState } from 'src/components/menu/store'
+import { loginReducer } from 'src/pages/login/store';
+import { menuState } from 'src/components/menu/store';
+import { photoState } from 'src/pages/photos/store';
 interface IMap {
   [name: string]: (state, action: MYAPP.DataAction) => void;
 }
@@ -51,7 +52,8 @@ interface IMap {
 // const rootReducer: Reducer = combineReducers(reducerMap.getReducerMap());
 const rootReducer: Reducer = combineReducers({
   loginReducer,
-  menuState
+  menuState,
+  photoState
 });
 
 export { rootReducer };
